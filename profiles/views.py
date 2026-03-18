@@ -90,3 +90,99 @@ class OnboardingStep3View(APIView):
             })
 
         return Response(serializer.errors, status=400)
+
+from datetime import date
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+
+from .models import UserProfile
+
+
+class HomeView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+
+        # Get user profile
+        profile = UserProfile.objects.get(user=user)
+
+        # BMI category logic
+        bmi = profile.bmi
+        if bmi < 18.5:
+            bmi_category = "Underweight"
+        elif bmi < 25:
+            bmi_category = "Normal"
+        else:
+            bmi_category = "Overweight"
+
+        # User data
+        user_data = {
+            "name": profile.name,
+            "current_weight": profile.weight,
+            "target_weight": profile.target_weight,
+            "bmi": profile.bmi,
+            "bmi_category": bmi_category,
+        }
+
+        # Date data
+        today = date.today()
+        date_data = {
+            "today_date": today,
+            "day_name": today.strftime("%A"),
+        }
+
+        # Static Success Stories
+        success_stories = [
+            {
+                "id": 1,
+                "name": "Rahul",
+                "result": "Lost 10kg",
+                "image": "https://example.com/image1.jpg"
+            },
+            {
+                "id": 2,
+                "name": "Neha",
+                "result": "Lost 8kg",
+                "image": "https://example.com/image2.jpg"
+            }
+        ]
+
+        # Static Recipes
+        recipes = [
+            {
+                "id": 1,
+                "name": "Salad",
+                "image": "https://example.com/salad.jpg",
+                "calories": 200
+            },
+            {
+                "id": 2,
+                "name": "Oats",
+                "image": "https://example.com/oats.jpg",
+                "calories": 150
+            }
+        ]
+
+        # Static Workouts
+        workouts = [
+            {
+                "id": 1,
+                "title": "Full Body Workout",
+                "thumbnail": "https://example.com/workout.jpg",
+                "video_url": "https://youtube.com/example",
+                "duration": "20 min"
+            }
+        ]
+
+        # Final Response
+        data = {
+            "user": user_data,
+            "date": date_data,
+            "success_stories": success_stories,
+            "recipes": recipes,
+            "workouts": workouts,
+        }
+
+        return Response(data)
