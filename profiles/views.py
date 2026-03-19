@@ -3,7 +3,9 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
 from .models import UserProfile
-from .serializers import Step1Serializer, Step2Serializer, Step3Serializer
+from datetime import date
+from .serializers import Step1Serializer, Step2Serializer, Step3Serializer, ProfileSerializer
+from weights.utils import get_latest_weight
 
 
 class OnboardingStep1View(APIView):
@@ -91,13 +93,6 @@ class OnboardingStep3View(APIView):
 
         return Response(serializer.errors, status=400)
 
-from datetime import date
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-
-from .models import UserProfile
-
 
 class HomeView(APIView):
     permission_classes = [IsAuthenticated]
@@ -184,5 +179,21 @@ class HomeView(APIView):
             "recipes": recipes,
             "workouts": workouts,
         }
+
+        return Response(data)
+
+class ProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        profile, _ = UserProfile.objects.get_or_create(user=request.user)
+
+        serializer = ProfileSerializer(profile)
+        data = serializer.data
+
+        # ✅ Override weight with latest weight
+        latest_weight = get_latest_weight(request.user)
+        if latest_weight:
+            data["weight"] = latest_weight
 
         return Response(data)
