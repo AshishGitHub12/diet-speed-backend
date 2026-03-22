@@ -186,7 +186,10 @@ class ProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        profile, _ = UserProfile.objects.get_or_create(user=request.user)
+        try:
+            profile = UserProfile.objects.get(user=request.user)
+        except UserProfile.DoesNotExist:
+            return Response({"detail": "Profile not found."}, status=404)
 
         serializer = ProfileSerializer(profile)
         data = serializer.data
