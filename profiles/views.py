@@ -57,8 +57,6 @@ class OnboardingStep2View(APIView):
 
             profile.height = height
             profile.height_unit = unit
-            profile.weight = weight
-            profile.bmi = bmi
 
             profile.save()
 
@@ -104,8 +102,25 @@ class HomeView(APIView):
         profile = UserProfile.objects.get(user=user)
 
         # BMI category logic
-        bmi = profile.bmi
-        if bmi < 18.5:
+        latest_weight = get_latest_weight(user)
+
+        height = profile.height
+        unit = profile.height_unit
+
+        bmi = None
+
+        if latest_weight and height:
+            if unit == "cm":
+                height_m = height / 100
+            else:
+                height_m = height
+
+            bmi = round(latest_weight / (height_m ** 2), 2)
+
+        # BMI category
+        if bmi is None:
+            bmi_category = "Not Available"
+        elif bmi < 18.5:
             bmi_category = "Underweight"
         elif bmi < 25:
             bmi_category = "Normal"
@@ -114,11 +129,11 @@ class HomeView(APIView):
 
         # User data
         user_data = {
-            "name": profile.name,
-            "current_weight": profile.weight,
-            "target_weight": profile.target_weight,
-            "bmi": profile.bmi,
-            "bmi_category": bmi_category,
+        "name": profile.name,
+        "current_weight": latest_weight,
+        "target_weight": profile.target_weight,
+        "bmi": bmi,
+        "bmi_category": bmi_category,
         }
 
         # Date data

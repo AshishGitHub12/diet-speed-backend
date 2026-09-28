@@ -6,7 +6,7 @@ class WeightLog(models.Model):
     weight = models.FloatField()
     date = models.DateField()
     note = models.TextField(blank=True, null=True)
-
+    bmi  = models.FloatField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

@@ -4,4 +4,5 @@ from .models import WeightLog
 class WeightLogSerializer(serializers.ModelSerializer):
     class Meta:
         model = WeightLog
-        fields = ['id', 'weight', 'date', 'note']
+        fields = ['id', 'weight', 'date', 'note', 'bmi', 'created_at']
+        read_only_fields = ['id', 'bmi', 'created_at']
