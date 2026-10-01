@@ -177,6 +177,7 @@ class HomeView(APIView):
 
 class ProfileView(APIView):
     permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def get(self, request):
         try:
@@ -192,3 +193,23 @@ class ProfileView(APIView):
             data["weight"] = latest_weight
 
         return Response(data)
+
+    def patch(self, request):
+        try:
+            profile = UserProfile.objects.get(user=request.user)
+        except UserProfile.DoesNotExist:
+            return Response({"detail": "Profile not found."}, status=404)
+
+        serializer = ProfileSerializer(profile, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            profile = serializer.save()
+            data = serializer.data
+
+            latest_weight = get_latest_weight(request.user)
+            if latest_weight:
+                data["weight"] = latest_weight
+
+            return Response(data)
+
+        return Response(serializer.errors, status=400)

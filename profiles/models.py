@@ -82,8 +82,9 @@ class UserProfile(models.Model):
     )
 
     LOOKING_FOR_CHOICES = (
-        ("diet_training_plans", "Diet and Training Plans"),
-        ("personal_training", "Personal Training"),
+        ("diet_and_training", "Diet and Training Plans"),
+        ("personal_training_online", "Personal Training (online, no diet plan)"),
+        ("tailored_diet_plans", "Diet and Tailored Plans"),
         ("both", "Both Nutrition & Training Plans Along With An Online Trainer"),
     )
 
