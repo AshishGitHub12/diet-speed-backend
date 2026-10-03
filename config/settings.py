@@ -35,7 +35,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'accounts',
     'profiles',
-    'weights'
+    'weights',
+    'meals',
 ]
 
 MIDDLEWARE = [

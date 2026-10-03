@@ -131,6 +131,7 @@ class UserProfile(models.Model):
     goal = models.CharField(max_length=30, choices=GOAL_CHOICES, blank=True)
     looking_for = models.CharField(max_length=30, choices=LOOKING_FOR_CHOICES, blank=True)
     target_weight = models.FloatField(null=True, blank=True)
+    calorie_goal = models.PositiveIntegerField(null=True, blank=True)
 
     onboarding_completed = models.BooleanField(default=False)
 

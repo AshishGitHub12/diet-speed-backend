@@ -18,6 +18,9 @@ from .serializers import (
     ProfileSerializer,
 )
 from weights.utils import get_latest_weight
+from meals.models import MealEntry
+
+DEFAULT_CALORIE_GOAL = 2000
 
 
 class BaseOnboardingStepView(APIView):
@@ -130,15 +133,24 @@ class HomeView(APIView):
         else:
             bmi_category = "Overweight"
 
+        today = date.today()
+
+        # Today's meal calories — same one-call pattern as current_weight
+        # above, so the Home tool card doesn't need its own network request.
+        todays_meals = MealEntry.objects.filter(user=user, date=today)
+        calories_consumed_today = sum(e.calories for e in todays_meals)
+        calorie_goal = profile.calorie_goal or DEFAULT_CALORIE_GOAL
+
         user_data = {
             "name": profile.name,
             "current_weight": latest_weight,
             "target_weight": profile.target_weight,
             "bmi": bmi,
             "bmi_category": bmi_category,
+            "calories_consumed_today": calories_consumed_today,
+            "calorie_goal": calorie_goal,
         }
 
-        today = date.today()
         date_data = {
             "today_date": today,
             "day_name": today.strftime("%A"),
